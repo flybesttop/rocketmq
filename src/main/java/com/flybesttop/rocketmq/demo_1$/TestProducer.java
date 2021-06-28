@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestProducer {
 
-    private String producerGroup = "test_group";
+    private String producerGroup = "test_producer_group";
 
     private String nameServerAddr = "42.192.197.225:9876";
 
@@ -23,6 +23,7 @@ public class TestProducer {
     public TestProducer() {
         mqProducer = new DefaultMQProducer();
         mqProducer.setNamesrvAddr(nameServerAddr);
+        mqProducer.setProducerGroup(producerGroup);
         //初始化
         start();
     }

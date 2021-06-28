@@ -1,5 +1,6 @@
 package com.flybesttop.rocketmq.demo_1$;
 
+import com.flybesttop.rocketmq.dto.BaseResponse;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.SendResult;
@@ -23,10 +24,11 @@ public class TestController {
     private final static String TOPIC = "test_topic";
 
     @RequestMapping("testProducer")
-    public void callBack(String text) throws InterruptedException, RemotingException, MQClientException, MQBrokerException {
+    public BaseResponse<String> callBack(String text) throws InterruptedException, RemotingException, MQClientException, MQBrokerException {
         Message message = new Message(TOPIC, "testTag", text.getBytes());
         SendResult res = testProducer.getMqProducer().send(message);
         System.out.println(res);
+        return new BaseResponse<>("消息发送成功");
     }
 
 }
