@@ -1,29 +1,26 @@
-package com.flybesttop.rocketmq.service;
+package com.flybesttop.rocketmq.consumer.PushConsumerGroup;
 
 import com.flybesttop.rocketmq.config.RocketMQConfig;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
-import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
+import org.apache.rocketmq.client.consumer.MessageSelector;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
-import org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyContext;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 import org.apache.rocketmq.common.message.Message;
-import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 /**
  * @author flybesttop
- * @description: 测试消费者 push
+ * @description: 测试消费者 A push
  */
 @Component
-public class PushConsumerService {
+public class PushConsumerService_A {
 
     @Value("${RocketMQ.nameServerAddr}")
     private String nameServerAddr;
@@ -38,6 +35,9 @@ public class PushConsumerService {
 
         // 设置consumer所订阅的Topic和Tag，*代表全部的Tag
         mqPushConsumer.subscribe(RocketMQConfig.TEST_TOPIC, "*");
+
+        // 消费者端消息过滤示例
+//        mqPushConsumer.subscribe(RocketMQConfig.TEST_TOPIC, MessageSelector.bySql("test between 10 and 20"));
 
         // 消费策略
         // CONSUME_FROM_LAST_OFFSET 默认策略，从该队列最尾开始消费，跳过历史消息
@@ -61,7 +61,7 @@ public class PushConsumerService {
             }
         });
         mqPushConsumer.start();
-        System.out.println("Consumer start ...");
+        System.out.println("Consumer_A start ...");
     }
 
 

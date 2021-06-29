@@ -1,4 +1,4 @@
-package com.flybesttop.rocketmq.service;
+package com.flybesttop.rocketmq.producer;
 
 import com.flybesttop.rocketmq.config.RocketMQConfig;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -14,7 +14,7 @@ import javax.annotation.PreDestroy;
  * @description 测试消息生产者
  */
 @Component
-public class ProducerService {
+public class DefaultProducer {
 
     private String producerGroup = RocketMQConfig.TEST_PRODUCER_GROUP;
 
