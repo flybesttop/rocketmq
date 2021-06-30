@@ -46,7 +46,7 @@ public class PushConsumerService_A {
         mqPushConsumer.registerMessageListener((MessageListenerConcurrently) (list, context) -> {
             try {
                 Message msg = list.get(0);
-                System.out.printf("%s Receive New Messages: %s %n", Thread.currentThread().getName(), new String(list.get(0).getBody()));
+                System.out.printf("%s Receive New Messages: %s %s %n", Thread.currentThread().getName(), "PushConsumerService_A", new String(list.get(0).getBody()));
                 String topic = msg.getTopic();
                 String body = new String(msg.getBody(), "utf-8");
                 String tags = msg.getTags();
@@ -54,7 +54,7 @@ public class PushConsumerService_A {
                 System.out.println("topic=" + topic + ", tags=" + tags + ", keys=" + keys + ", msg=" + body);
                 // 成功就返回broker，让其进行删除
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
-            } catch (UnsupportedEncodingException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 // 失败就返回broker，让其稍后重试
                 return ConsumeConcurrentlyStatus.RECONSUME_LATER;

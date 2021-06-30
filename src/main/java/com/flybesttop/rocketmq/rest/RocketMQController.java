@@ -4,14 +4,18 @@ import com.flybesttop.rocketmq.config.RocketMQConfig;
 import com.flybesttop.rocketmq.producer.OrderProducer;
 import com.flybesttop.rocketmq.producer.DefaultProducer;
 import com.flybesttop.rocketmq.dto.BaseResponse;
+import com.flybesttop.rocketmq.producer.TransactionProducer;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.apache.rocketmq.client.producer.MessageQueueSelector;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.common.message.MessageQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +31,10 @@ public class RocketMQController {
     private DefaultProducer defaultProducer;
 
     @Autowired
-    private OrderProducer orderProducerA;
+    private OrderProducer orderProducer;
+
+    @Autowired
+    private TransactionProducer txProducer;
 
     /**
      * 发送同步，非顺序消息
@@ -165,9 +172,13 @@ public class RocketMQController {
                     // 通过send方法中传入的MessageQueueSelector来实现选择对应的队列
                     // args一般是唯一id 用send的第三个参数传入（这里指的i）
                     // 这里是通过 订单id 对队列数取余来保证属于每一个订单的三条消息会被发送到同一个队列中
-                    SendResult result = orderProducerA.getMqProducer().send(message, (mqs, msg, arg) -> {
-                        int queueNum = (Integer) arg % mqs.size();
-                        return mqs.get(queueNum);
+
+                    SendResult result = orderProducer.getMqProducer().send(message, new MessageQueueSelector() {
+                        @Override
+                        public MessageQueue select(List<MessageQueue> mqs, Message msg, Object arg) {
+                            int queueNum = (Integer) arg % mqs.size();
+                            return mqs.get(queueNum);
+                        }
                     }, orderId);
                     System.out.println(result);
                 }
@@ -194,6 +205,28 @@ public class RocketMQController {
                 System.out.println(res);
             }
         } catch (Exception e) {
+            return new BaseResponse<>("消息发送失败");
+        }
+        return new BaseResponse<>("消息发送成功");
+    }
+
+    /**
+     * 事务消息发送
+     *
+     * @param text
+     * @return
+     */
+    @RequestMapping("transactionProducerMessage")
+    public BaseResponse<String> transactionProducerMessage(String text) {
+        try {
+            for (int i = 1; i <= 1; i++) {
+                String sendText = "No." + i + " value:" + text;
+                Message message = new Message(RocketMQConfig.TEST_TOPIC, "transactionMessage", sendText.getBytes());
+                SendResult res = txProducer.getMqProducer().sendMessageInTransaction(message,null);
+                System.out.println(res);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             return new BaseResponse<>("消息发送失败");
         }
         return new BaseResponse<>("消息发送成功");

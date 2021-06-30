@@ -42,7 +42,7 @@ public class PushConsumerService_B {
         mqPushConsumer.registerMessageListener((MessageListenerConcurrently) (list, context) -> {
             try {
                 Message msg = list.get(0);
-                System.out.printf("%s Receive New Messages: %s %n", Thread.currentThread().getName(), new String(list.get(0).getBody()));
+                System.out.printf("%s Receive New Messages: %s %s %n", Thread.currentThread().getName(), "PushConsumerService_B", new String(list.get(0).getBody()));
                 String topic = msg.getTopic();
                 String body = new String(msg.getBody(), "utf-8");
                 String tags = msg.getTags();

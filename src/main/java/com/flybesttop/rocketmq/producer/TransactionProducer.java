@@ -1,6 +1,7 @@
 package com.flybesttop.rocketmq.producer;
 
 import com.flybesttop.rocketmq.config.RocketMQConfig;
+import com.flybesttop.rocketmq.listener.TransactionListenerImpl;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.LocalTransactionState;
@@ -57,7 +58,8 @@ public class TransactionProducer {
         mqProducer.setVipChannelEnabled(false);
         //事务相关
         mqProducer.setExecutorService(executorService);
-        mqProducer.setTransactionListener(new TransactionListenerImpl());
+        TransactionListener transactionListener = new TransactionListenerImpl();
+        mqProducer.setTransactionListener(transactionListener);
         try {
             mqProducer.start();
         } catch (MQClientException e) {
@@ -68,49 +70,6 @@ public class TransactionProducer {
     @PreDestroy
     public void destroySyncProducer(){
         mqProducer.shutdown();
-    }
-
-    /**
-     * 事务监听
-     */
-    class TransactionListenerImpl implements TransactionListener {
-        /**
-         * 第一次判断是否提交或回滚
-         *
-         * @param message
-         * @param arg
-         * @return
-         */
-        @Override
-        public LocalTransactionState executeLocalTransaction(Message message, Object arg){
-
-            //message就是那个半发送的消息 arg是在transcationProducter.send(Message,Object)时的另外一个携带参数）
-
-            //执行本地事务或调用其他为服务
-
-            if(true){
-                return LocalTransactionState.COMMIT_MESSAGE;
-            }
-
-            if(true){
-                return LocalTransactionState.ROLLBACK_MESSAGE;
-            }
-
-            //如果在检查事务时数据库出现宕机可以让broker过一段时间回查 和return null 效果相同
-            return LocalTransactionState.UNKNOW;
-        }
-
-        /**
-         * 返回UNKOWN时回查！
-         * @param messageExt
-         * @return
-         */
-        @Override
-        public LocalTransactionState checkLocalTransaction(MessageExt messageExt) {
-            //只去返回commit或者rollback
-            return LocalTransactionState.COMMIT_MESSAGE;
-        }
-
     }
 
 }
